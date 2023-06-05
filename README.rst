@@ -1,6 +1,6 @@
 .. _peripheral_uart:
 
-Bluetooth: Peripheral UART
+Bluetooth: Drone code Using NoricSemi Peripheral UART
 ##########################
 
 .. contents::
