@@ -14,6 +14,7 @@ target_sources(app PRIVATE
 )
 target_sources(app PRIVATE src/drivers/PWM/pwm_local.c)
 target_sources(app PRIVATE src/drivers/SPIM/spim_local.c)
+target_sources(app PRIVATE src/drivers/GPIO_INPUT/gpio_input_local.c)
 
 # Include UART ASYNC API adapter
 target_sources_ifdef(CONFIG_BT_NUS_UART_ASYNC_ADAPTER app PRIVATE

@@ -556,6 +556,7 @@ void main(void)
 	int blink_status = 0;
 	uint32_t period = MAX_PERIOD;
 	int err = 0;
+	int ret;
 
 	configure_gpio();
 	pwm_check_ready();
@@ -566,6 +567,57 @@ void main(void)
 	setDuty(pwm_led3, period, period / 10U);
 	
 	spi_init();
+
+	/* configure input GPIO to sense IMU interrupt*/
+	if (!gpio_is_ready_dt(&button))
+	{
+		printk("Error: button device %s is not ready\n",
+			   button.port->name);
+		return 0;
+	}
+
+	ret = gpio_pin_configure_dt(&button, GPIO_INPUT);
+	if (ret != 0)
+	{
+		printk("Error %d: failed to configure %s pin %d\n",
+			   ret, button.port->name, button.pin);
+		return 0;
+	}
+
+	ret = gpio_pin_interrupt_configure_dt(&button,
+										  GPIO_INT_EDGE_TO_ACTIVE);
+	if (ret != 0)
+	{
+		printk("Error %d: failed to configure interrupt on %s pin %d\n",
+			   ret, button.port->name, button.pin);
+		return 0;
+	}
+
+	gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
+	gpio_add_callback(button.port, &button_cb_data);
+	printk("Set up button at %s pin %d\n", button.port->name, button.pin);
+
+	if (led.port && !device_is_ready(led.port))
+	{
+		printk("Error %d: LED device %s is not ready; ignoring it\n",
+			   ret, led.port->name);
+		led.port = NULL;
+	}
+	if (led.port)
+	{
+		ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT);
+		if (ret != 0)
+		{
+			printk("Error %d: failed to configure LED device %s pin %d\n",
+				   ret, led.port->name, led.pin);
+			led.port = NULL;
+		}
+		else
+		{
+			printk("Set up LED at %s pin %d\n", led.port->name, led.pin);
+		}
+	}
+	/************************************************/
 
 	err = uart_init();
 	if (err) {
