@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) 2019-2020 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+ #include "nrf5340_cpuapp_common-pinctrl.overlay"
+
+/ {
+     pwmleds {
+         compatible = "pwm-leds";
+         pwm_led0: pwm_led_0 {
+             pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+         };
+         pwm_led1: pwm_led_1 {
+             pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+         };
+         pwm_led2: pwm_led_2 {
+             pwms = <&pwm0 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+         };
+         pwm_led3: pwm_led_3 {
+             pwms = <&pwm0 3 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+         };
+     };
+
+    cs {
+		compatible = "gpio-leds";
+        spi4_cs: spi4_cs {
+            gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;	/* D9 */
+            label = "SPI4 CS";
+        };
+    };
+
+    chosen {
+		nordic,nus-uart = &uart0;
+	};
+    
+     aliases {
+        pwm-led0 = &pwm_led0;
+        pwm-led1 = &pwm_led1;
+        pwm-led2 = &pwm_led2;
+        pwm-led3 = &pwm_led3;
+        spi4-cs = &spi4_cs;
+     };
+
+};
+
+arduino_spi: &spi4 {
+	compatible = "nordic,nrf-spim";
+	status = "okay";
+	//cs-gpios = <&arduino_header 16 GPIO_ACTIVE_LOW>; /* D10 */
+	cs-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>; /* D10 */
+	pinctrl-0 = <&spi4_default>;
+	pinctrl-1 = <&spi4_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+&i2c1 {  
+    clock-frequency = <I2C_BITRATE_STANDARD>;
+    mysensor: mysensor@4a{
+        compatible = "i2c-device";
+        status = "okay";
+        reg = < 0x4a >;
+    };
+};
+
+
+my_spi_master: &spi4 {
+	compatible = "nordic,nrf-spim";
+	status = "okay";
+	pinctrl-0 = <&spi_master_default>;
+	pinctrl-1 = <&spi_master_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio0 26 GPIO_ACTIVE_LOW>;
+	reg_my_spi_master:  spi-dev-a@0 {
+		reg = <0>;
+	};
+};
+
+my_spi_slave: &spi3 {
+	compatible = "nordic,nrf-spis";
+	status = "okay";
+	pinctrl-0 = <&spi_slave_default>;
+	pinctrl-1 = <&spi_slave_sleep>;
+	pinctrl-names = "default", "sleep";
+	def-char = <0x00>;
+};
+
+&zephyr_udc0 {
+	cdc_acm_uart1: cdc_acm_uart1 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
+
+/*
+@spi4 {
+    mysensor: mysensor@4a {
+        compatible = "my,sensor";
+        reg = <0x4a>;
+        spi-max-frequency = <1000000>;
+        label="mysensor";
+    };
+};
+*/
