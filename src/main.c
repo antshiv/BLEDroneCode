@@ -10,6 +10,9 @@
 #include "includes.h"
 #include "drivers/PWM/pwm_local.h"
 #include "drivers/SPIM/spim_local.h"
+#include "drivers/GPIO_INPUT/gpio_input_local.h"
+
+#define SLEEP_TIME_MS 1
 
 #define LOG_MODULE_NAME peripheral_uart
 LOG_MODULE_REGISTER(LOG_MODULE_NAME);
@@ -561,6 +564,8 @@ void main(void)
 	setDuty(pwm_led1, period, period / 2U);
 	setDuty(pwm_led2, period, period / 10U);
 	setDuty(pwm_led3, period, period / 10U);
+	
+	spi_init();
 
 	err = uart_init();
 	if (err) {
@@ -610,6 +615,19 @@ void main(void)
 	for (;;) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+
+		/* Interfacting with sensor using SPI */
+		err = gpio_pin_toggle_dt(&spi4_cs);
+		if (err < 0)
+		{
+			return;
+		}
+		k_msleep(SLEEP_TIME_MS);
+		spi_write_test_msg();
+		err = gpio_pin_toggle_dt(&spi4_cs);
+	    /* end sending info using SPI */	
+		
+		k_sleep(K_SECONDS(4U));
 	}
 }
 
