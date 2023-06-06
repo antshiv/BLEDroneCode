@@ -12,6 +12,9 @@
 #include "drivers/SPIM/spim_local.h"
 #include "drivers/GPIO_INPUT/gpio_input_local.h"
 
+/*** include sensors */
+#include "sensors/IMU_CEVA_FSM300/ceva_fsm300.h"
+
 #define SLEEP_TIME_MS 1
 
 #define LOG_MODULE_NAME peripheral_uart
@@ -569,6 +572,8 @@ void main(void)
 	spi_init();
 
 	/* configure input GPIO to sense IMU interrupt*/
+	/**********************************************/
+
 	if (!gpio_is_ready_dt(&button))
 	{
 		printk("Error: button device %s is not ready\n",
@@ -593,7 +598,7 @@ void main(void)
 		return 0;
 	}
 
-	gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
+	gpio_init_callback(&button_cb_data, fsm_interrupt_triggered, BIT(button.pin));
 	gpio_add_callback(button.port, &button_cb_data);
 	printk("Set up button at %s pin %d\n", button.port->name, button.pin);
 
@@ -669,14 +674,14 @@ void main(void)
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 
 		/* Interfacting with sensor using SPI */
-		err = gpio_pin_toggle_dt(&spi4_cs);
-		if (err < 0)
-		{
-			return;
-		}
-		k_msleep(SLEEP_TIME_MS);
-		spi_write_test_msg();
-		err = gpio_pin_toggle_dt(&spi4_cs);
+		//err = gpio_pin_toggle_dt(&spi4_cs);
+		//if (err < 0)
+		//{
+			//return;
+		//}
+		//k_msleep(SLEEP_TIME_MS);
+		//spi_write_test_msg();
+		//err = gpio_pin_toggle_dt(&spi4_cs);
 	    /* end sending info using SPI */	
 		
 		k_sleep(K_SECONDS(4U));
@@ -694,12 +699,19 @@ void ble_write_thread(void)
 						     K_FOREVER);
 
 		if (bt_nus_send(NULL, buf->data, buf->len)) {
+			printk("Failed to send data over BLE connection");
 			LOG_WRN("Failed to send data over BLE connection");
 		}
 
 		k_free(buf);
+		k_yield();
 	}
 }
 
+
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 		NULL, PRIORITY, 0, 0);
+
+K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
+		NULL, 8, 0, 0);
+		

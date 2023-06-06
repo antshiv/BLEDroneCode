@@ -2,6 +2,8 @@
 #include "spim_local.h"
 
 const struct device *spi_dev;
+struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
+const struct gpio_dt_spec spi4_cs = GPIO_DT_SPEC_GET(DT_ALIAS(spi4_cs), gpios);
 struct spi_cs_control spim_cs = {
     .gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(reg_my_spi_master)),
     .delay = 0,

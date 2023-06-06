@@ -16,6 +16,10 @@ target_sources(app PRIVATE src/drivers/PWM/pwm_local.c)
 target_sources(app PRIVATE src/drivers/SPIM/spim_local.c)
 target_sources(app PRIVATE src/drivers/GPIO_INPUT/gpio_input_local.c)
 
+# Include sensors
+target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/ceva_fsm300.c)
+
+
 # Include UART ASYNC API adapter
 target_sources_ifdef(CONFIG_BT_NUS_UART_ASYNC_ADAPTER app PRIVATE
   src/uart_async_adapter.c
