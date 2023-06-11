@@ -1,0 +1,3 @@
+[submodule "src/sensors/IMU_CEVA_FSM300/sh2"]
+	path = src/sensors/IMU_CEVA_FSM300/sh2
+	url = https://github.com/ceva-dsp/sh2.git
