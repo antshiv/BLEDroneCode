@@ -45,10 +45,18 @@
     cs {
 		compatible = "gpio-leds";
         spi4_cs: spi4_cs {
-            gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;	/* D9 */
+            gpios = <&gpio0 5 GPIO_ACTIVE_HIGH>;	/* D9 */
             label = "SPI4 CS";
         };
     };
+
+	bootn {
+		compatible = "gpio-leds";
+		fsmbootn: fsmbootn {
+			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;	/* D8 */
+			label = "FSM BOOTN";
+		};
+	};
     
     buttons {
 		compatible = "gpio-keys";
@@ -68,6 +76,8 @@
         pwm-led2 = &pwm_led2;
         pwm-led3 = &pwm_led3;
         spi4-cs = &spi4_cs;
+		fsmrstn = &spi4_cs;
+		fsmbootn = &fsmbootn;
 		sw0 = &button0;
         led2 = &led2;
      };

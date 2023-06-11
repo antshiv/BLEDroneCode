@@ -570,6 +570,8 @@ void main(void)
 	setDuty(pwm_led3, period, period / 10U);
 	
 	spi_init();
+	k_msleep(500);	
+	FSM_init();	
 
 	/* configure input GPIO to sense IMU interrupt*/
 	/**********************************************/
@@ -668,6 +670,7 @@ void main(void)
 		LOG_ERR("Advertising failed to start (err %d)", err);
 		return;
 	}
+
 
 	for (;;) {
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
