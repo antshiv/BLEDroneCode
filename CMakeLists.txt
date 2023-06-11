@@ -18,6 +18,8 @@ target_sources(app PRIVATE src/drivers/GPIO_INPUT/gpio_input_local.c)
 
 # Include sensors 
 target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/ceva_fsm300.c)
+target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/cal_app.c)
+#target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/demo_app.c)
 # Include SH2
 target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/shtp.c)
 target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2.c)
