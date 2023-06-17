@@ -53,7 +53,7 @@
 	bootn {
 		compatible = "gpio-leds";
 		fsmbootn: fsmbootn {
-			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;	/* D8 */
+			gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;	/* D8 */
 			label = "FSM BOOTN";
 		};
 	};

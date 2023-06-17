@@ -100,7 +100,7 @@ static void configShakeDetector(void)
 
     int status = sh2_setFrs(SHAKE_DETECT_CONFIG, frsData, 5);
     if (status < 0) {
-        printf("Configure shake detector failed: %d\n", status);
+        printk("Configure shake detector failed: %d\n", status);
     }
 }
 
@@ -109,6 +109,7 @@ static void configShakeDetector(void)
 // Configure one sensor to produce periodic reports
 static void startReports()
 {
+    printk('start reports called \n');
     static sh2_SensorConfig_t config;
     int status;
     int sensorId;
@@ -146,7 +147,7 @@ static void startReports()
         sensorId = enabledSensors[n];
         status = sh2_setSensorConfig(sensorId, &config);
         if (status != 0) {
-            printf("Error while enabling sensor %d\n", sensorId);
+            printk("Error while enabling sensor %d\n", sensorId);
         }
     }
     
@@ -155,6 +156,7 @@ static void startReports()
 // Handle non-sensor events from the sensor hub
 static void eventHandler(void * cookie, sh2_AsyncEvent_t *pEvent)
 {
+    //printk('event handler called');
     // If we see a reset, set a flag so that sensors will be reconfigured.
     if (pEvent->eventId == SH2_RESET) {
         resetOccurred = true;
@@ -165,21 +167,21 @@ static void eventHandler(void * cookie, sh2_AsyncEvent_t *pEvent)
 // Print headers for DSF format output
 static void printDsfHeaders(void)
 {
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, ANG_POS_GLOBAL[rijk]{quaternion}, ANG_POS_ACCURACY[x]{rad}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, ANG_POS_GLOBAL[rijk]{quaternion}, ANG_POS_ACCURACY[x]{rad}\n",
            SH2_ROTATION_VECTOR);
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, GAME_ROTATION_VECTOR[rijk]{quaternion}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, GAME_ROTATION_VECTOR[rijk]{quaternion}\n",
            SH2_GAME_ROTATION_VECTOR);
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, RAW_ACCELEROMETER[xyz]{adc units}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, RAW_ACCELEROMETER[xyz]{adc units}\n",
            SH2_RAW_ACCELEROMETER);
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, RAW_MAGNETOMETER[xyz]{adc units}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, RAW_MAGNETOMETER[xyz]{adc units}\n",
            SH2_RAW_MAGNETOMETER);
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, RAW_GYROSCOPE[xyz]{adc units}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, RAW_GYROSCOPE[xyz]{adc units}\n",
            SH2_RAW_GYROSCOPE);
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, ACCELEROMETER[xyz]{m/s^2}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, ACCELEROMETER[xyz]{m/s^2}\n",
            SH2_ACCELEROMETER);
-    printf("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, MAG_FIELD[xyz]{uTesla}, STATUS[x]{enum}\n",
+    printk("+%d TIME[x]{s}, SAMPLE_ID[x]{samples}, MAG_FIELD[xyz]{uTesla}, STATUS[x]{enum}\n",
            SH2_MAGNETIC_FIELD_CALIBRATED);
-    printf("+%d TIME[x]{s}, ANG_VEL_GYRO_RV[xyz]{rad/s}, ANG_POS_GYRO_RV[wxyz]{quaternion}\n",
+    printk("+%d TIME[x]{s}, ANG_VEL_GYRO_RV[xyz]{rad/s}, ANG_POS_GYRO_RV[wxyz]{quaternion}\n",
            SH2_GYRO_INTEGRATED_RV);
 }
 #endif
@@ -206,7 +208,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
     
     switch (value.sensorId) {
         case SH2_RAW_ACCELEROMETER:
-            printf(".%d %0.6f, %d, %d, %d, %d\n",
+            printk(".%d %0.6f, %d, %d, %d, %d\n",
                    SH2_RAW_ACCELEROMETER,
                    t,
                    lastSequence[value.sensorId],
@@ -216,7 +218,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
             break;
         
         case SH2_RAW_MAGNETOMETER:
-            printf(".%d %0.6f, %d, %d, %d, %d\n",
+            printk(".%d %0.6f, %d, %d, %d, %d\n",
                    SH2_RAW_MAGNETOMETER,
                    t,
                    lastSequence[value.sensorId],
@@ -226,7 +228,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
             break;
         
         case SH2_RAW_GYROSCOPE:
-            printf(".%d %0.6f, %d, %d, %d, %d\n",
+            printk(".%d %0.6f, %d, %d, %d, %d\n",
                    SH2_RAW_GYROSCOPE,
                    t,
                    lastSequence[value.sensorId],
@@ -236,7 +238,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
             break;
 
         case SH2_MAGNETIC_FIELD_CALIBRATED:
-            printf(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f, %u\n",
+            printk(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f, %u\n",
                    SH2_MAGNETIC_FIELD_CALIBRATED,
                    t,
                    lastSequence[value.sensorId],
@@ -248,7 +250,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
             break;
         
         case SH2_ACCELEROMETER:
-            printf(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f\n",
+            printk(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f\n",
                    SH2_ACCELEROMETER,
                    t,
                    lastSequence[value.sensorId],
@@ -263,7 +265,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
             j = value.un.rotationVector.j;
             k = value.un.rotationVector.k;
             acc_rad = value.un.rotationVector.accuracy;
-            printf(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f\n",
+            printk(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f\n",
                    SH2_ROTATION_VECTOR,
                    t,
                    lastSequence[value.sensorId],
@@ -276,7 +278,7 @@ static void printDsf(const sh2_SensorEvent_t * event)
             i = value.un.gameRotationVector.i;
             j = value.un.gameRotationVector.j;
             k = value.un.gameRotationVector.k;
-            printf(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f, %0.6f\n",
+            printk(".%d %0.6f, %d, %0.6f, %0.6f, %0.6f, %0.6f\n",
                    SH2_GAME_ROTATION_VECTOR,
                    t,
                    lastSequence[value.sensorId],
@@ -291,14 +293,14 @@ static void printDsf(const sh2_SensorEvent_t * event)
             i = value.un.gyroIntegratedRV.i;
             j = value.un.gyroIntegratedRV.j;
             k = value.un.gyroIntegratedRV.k;
-            printf(".%d %0.6f, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f\n",
+            printk(".%d %0.6f, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f, %0.6f\n",
                    SH2_GYRO_INTEGRATED_RV,
                    t,
                    angVelX, angVelY, angVelZ,
                    r, i, j, k);
             break;
         default:
-            printf("Unknown sensor: %d\n", value.sensorId);
+            printk("Unknown sensor: %d\n", value.sensorId);
             break;
     }
 }
@@ -325,13 +327,13 @@ static void reportProdIds(void)
     status = sh2_getProdIds(&prodIds);
     
     if (status < 0) {
-        printf("Error from sh2_getProdIds.\n");
+        printk("Error from sh2_getProdIds.\n");
         return;
     }
 
     // Report the results
     for (int n = 0; n < prodIds.numEntries; n++) {
-        printf("Part %d : Version %d.%d.%d Build %d\n",
+        printk("Part %d : Version %d.%d.%d Build %d\n",
                prodIds.entry[n].swPartNumber,
                prodIds.entry[n].swVersionMajor, prodIds.entry[n].swVersionMinor, 
                prodIds.entry[n].swVersionPatch, prodIds.entry[n].swBuildNumber);
@@ -355,14 +357,14 @@ static void printEvent(const sh2_SensorEvent_t * event)
 
     rc = sh2_decodeSensorEvent(&value, event);
     if (rc != SH2_OK) {
-        printf("Error decoding sensor event: %d\n", rc);
+        printk("Error decoding sensor event: %d\n", rc);
         return;
     }
 
     t = value.timestamp / 1000000.0;  // time in seconds.
     switch (value.sensorId) {
         case SH2_RAW_ACCELEROMETER:
-            printf("%8.4f Raw acc: %d %d %d\n",
+            printk("%8.4f Raw acc: %d %d %d\n",
                    t,
                    value.un.rawAccelerometer.x,
                    value.un.rawAccelerometer.y,
@@ -370,7 +372,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
             break;
 
         case SH2_ACCELEROMETER:
-            printf("%8.4f Acc: %f %f %f\n",
+            printk("%8.4f Acc: %f %f %f\n",
                    t,
                    value.un.accelerometer.x,
                    value.un.accelerometer.y,
@@ -378,7 +380,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
             break;
             
         case SH2_RAW_GYROSCOPE:
-            printf("%8.4f Raw gyro: x:%d y:%d z:%d temp:%d time_us:%d\n",
+            printk("%8.4f Raw gyro: x:%d y:%d z:%d temp:%d time_us:%d\n",
                    t,
                    value.un.rawGyroscope.x,
                    value.un.rawGyroscope.y,
@@ -394,7 +396,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
             k = value.un.rotationVector.k;
             acc_deg = scaleRadToDeg * 
                 value.un.rotationVector.accuracy;
-            printf("%8.4f Rotation Vector: "
+            printk("%8.4f Rotation Vector: "
                    "r:%0.6f i:%0.6f j:%0.6f k:%0.6f (acc: %0.6f deg)\n",
                    t,
                    r, i, j, k, acc_deg);
@@ -404,7 +406,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
             i = value.un.gameRotationVector.i;
             j = value.un.gameRotationVector.j;
             k = value.un.gameRotationVector.k;
-            printf("%8.4f GRV: "
+            printk("%8.4f GRV: "
                    "r:%0.6f i:%0.6f j:%0.6f k:%0.6f\n",
                    t,
                    r, i, j, k);
@@ -413,7 +415,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
             x = value.un.gyroscope.x;
             y = value.un.gyroscope.y;
             z = value.un.gyroscope.z;
-            printf("%8.4f GYRO: "
+            printk("%8.4f GYRO: "
                    "x:%0.6f y:%0.6f z:%0.6f\n",
                    t,
                    x, y, z);
@@ -422,7 +424,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
             x = value.un.gyroscopeUncal.x;
             y = value.un.gyroscopeUncal.y;
             z = value.un.gyroscopeUncal.z;
-            printf("%8.4f GYRO_UNCAL: "
+            printk("%8.4f GYRO_UNCAL: "
                    "x:%0.6f y:%0.6f z:%0.6f\n",
                    t,
                    x, y, z);
@@ -440,7 +442,7 @@ static void printEvent(const sh2_SensorEvent_t * event)
                 x = value.un.gyroIntegratedRV.angVelX;
                 y = value.un.gyroIntegratedRV.angVelY;
                 z = value.un.gyroIntegratedRV.angVelZ;
-                printf("%8.4f Gyro Integrated RV: "
+                printk("%8.4f Gyro Integrated RV: "
                        "r:%0.6f i:%0.6f j:%0.6f k:%0.6f x:%0.6f y:%0.6f z:%0.6f\n",
                        t,
                        r, i, j, k,
@@ -448,19 +450,19 @@ static void printEvent(const sh2_SensorEvent_t * event)
             }
             break;
         case SH2_IZRO_MOTION_REQUEST:
-            printf("IZRO Request: intent:%d, request:%d\n",
+            printk("IZRO Request: intent:%d, request:%d\n",
                    value.un.izroRequest.intent,
                    value.un.izroRequest.request);
             break;
         case SH2_SHAKE_DETECTOR:
-            printf("Shake Axis: %c%c%c\n", 
+            printk("Shake Axis: %c%c%c\n", 
                    (value.un.shakeDetector.shake & SHAKE_X) ? 'X' : '.',
                    (value.un.shakeDetector.shake & SHAKE_Y) ? 'Y' : '.',
                    (value.un.shakeDetector.shake & SHAKE_Z) ? 'Z' : '.');
 
             break;
         default:
-            printf("Unknown sensor: %d\n", value.sensorId);
+            printk("Unknown sensor: %d\n", value.sensorId);
             break;
     }
 }
@@ -483,20 +485,20 @@ void demo_init(void)
 {
     int status;
     
-    printf("\n\nCEVA SH2 Sensor Hub Demo.\n\n");
+    printk("\n\nCEVA SH2 Sensor Hub Demo.\n\n");
     
 #ifdef PERFORM_DFU
-    printf("DFU completes in 10-25 seconds in most configurations.\n");
-    printf("It can take up to 240 seconds with 9600 baud UART.\n");
-    printf("DFU Process started.\n");
+    printk("DFU completes in 10-25 seconds in most configurations.\n");
+    printk("It can take up to 240 seconds with 9600 baud UART.\n");
+    printk("DFU Process started.\n");
     status = dfu();
     if (status == SH2_OK) {
-        printf("DFU completed successfully.\n");
+        printk("DFU completed successfully.\n");
     }
     else {
-        printf("DFU failed.  Error=%d.\n", status);
+        printk("DFU failed.  Error=%d.\n", status);
         if (status == SH2_ERR_BAD_PARAM) {
-            printf("Is the firmware image valid?\n");
+            printk("Is the firmware image valid?\n");
         }
     }
 #endif
@@ -507,7 +509,7 @@ void demo_init(void)
     // Open SH2 interface (also registers non-sensor event handler.)
     status = sh2_open(pSh2Hal, eventHandler, NULL);
     if (status != SH2_OK) {
-        printf("Error, %d, from sh2_open.\n", status);
+        printk("Error, %d, from sh2_open.\n", status);
     }
 
     // Register sensor listener
