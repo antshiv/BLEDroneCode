@@ -622,6 +622,7 @@ void main(void)
 
 	configure_gpio();
 	err = gpio_pin_configure_dt(&fsmbootn, GPIO_OUTPUT);
+	//err = gpio_pin_configure_dt(&fsmwaken, GPIO_OUTPUT);
 	printk("Set up button at %s pin %d\n", fsmbootn.port->name, fsmbootn.pin);
 	if (err)
 	{
@@ -798,4 +799,4 @@ K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
-				NULL, 8, 0, 0);
+				NULL, PRIORITY, 0, 0);

@@ -12,6 +12,7 @@ void fsm_interrupt_triggered(const struct device *dev, struct gpio_callback *cb,
 
 extern const struct gpio_dt_spec fsmrrstn;
 extern const struct gpio_dt_spec fsmbootn;
+extern const struct gpio_dt_spec fsmwaken;
 void FSM_thread(void);
 void FSM_process_data();
 void FSM_init();

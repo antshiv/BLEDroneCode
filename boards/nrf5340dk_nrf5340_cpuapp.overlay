@@ -57,6 +57,14 @@
 			label = "FSM BOOTN";
 		};
 	};
+
+	waken {
+		compatible = "gpio-leds";
+		fsmwaken: fsmwaken {
+			gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;	/* D7 */
+			label = "FSM WAKEN";
+		};
+	};
     
     buttons {
 		compatible = "gpio-keys";
@@ -78,6 +86,7 @@
         spi4-cs = &spi4_cs;
 		fsmrstn = &spi4_cs;
 		fsmbootn = &fsmbootn;
+		fsmwaken = &fsmwaken;
 		sw0 = &button0;
         led2 = &led2;
      };
