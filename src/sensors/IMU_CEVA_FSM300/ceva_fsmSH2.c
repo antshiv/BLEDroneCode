@@ -241,7 +241,7 @@ static void startReports()
 
     // Select a report interval.
     // config.reportInterval_us = 100000;  // microseconds (10 Hz)
-     config.reportInterval_us = 40000;  // microseconds (25 Hz)
+    config.reportInterval_us = 40000; // microseconds (25 Hz)
     // config.reportInterval_us = 10000; // microseconds (100 Hz)
     // config.reportInterval_us = 2500;   // microseconds (400 Hz)
     // config.reportInterval_us = 1000;   // microseconds (1000 Hz)
@@ -305,12 +305,12 @@ static void fsmProcessInit()
             // k_usleep(1000);
             // startReports();
         }
-        case CHAN_SENSORHUB_CONTROL:
-        {
-            //printk('chan sensorhub control\n');   
-        }
-        /* code */
-        break;
+    case CHAN_SENSORHUB_CONTROL:
+    {
+        // printk('chan sensorhub control\n');
+    }
+    /* code */
+    break;
     default:
         break;
     }
@@ -354,6 +354,7 @@ static void printEvent(const sh2_SensorEvent_t *event)
     }
 
     t = value.timestamp / 1000000.0; // time in seconds.
+    printk("value sensor id %d\n", value.sensorId);
     switch (value.sensorId)
     {
     case SH2_RAW_ACCELEROMETER:
@@ -399,7 +400,7 @@ static void printEvent(const sh2_SensorEvent_t *event)
         i = value.un.gameRotationVector.i;
         j = value.un.gameRotationVector.j;
         k = value.un.gameRotationVector.k;
-        printk("%8.4f GRV: "
+        printf("%8.4f GRV: "
                "r:%0.6f i:%0.6f j:%0.6f k:%0.6f\n",
                t,
                r, i, j, k);
@@ -519,7 +520,6 @@ static void SHInputHandler(uint8_t *payload, uint16_t len, uint32_t timestamp)
             else
             {
                 // Sensor event.  Call callback
-                printk("next packet info : %x\n", payload[cursor]);
                 uint8_t *pReport = payload + cursor;
                 uint16_t delay = ((pReport[2] & 0xFC) << 6) + pReport[3];
                 event.timestamp_uS = touSTimestamp(timestamp, referenceDelta, delay);
@@ -527,6 +527,7 @@ static void SHInputHandler(uint8_t *payload, uint16_t len, uint32_t timestamp)
                 event.reportId = reportId;
                 memcpy(event.report, pReport, reportLen);
                 event.len = reportLen;
+                printk("next packet info : %x, len %d\n", payload[cursor], event.len);
                 printEvent(&event);
                 // if (pSh2->sensorCallback != 0) {
                 // pSh2->sensorCallback(pSh2->sensorCookie, &event);
@@ -552,7 +553,7 @@ void FSM_thread(void)
                     waken(true);
                     wakenComplete = true;
                 }
-                //printk('SPI_WRITE Sent report\n');
+                // printk('SPI_WRITE Sent report\n');
                 startReports();
             }
             else
@@ -575,7 +576,7 @@ void FSM_thread(void)
                 if (resetComplete)
                 {
                     printk("Event received: rxBuf[4]: %x\n", rxBuf[4]);
-                    // SHInputHandler(&rxBuf[4], packet_length - 4, k_uptime_get());
+                    SHInputHandler(&rxBuf[4], packet_length - 4, k_uptime_get());
                     // printEvent(&rxBuf[4]);
                 }
                 else
