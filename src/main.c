@@ -19,7 +19,7 @@
 #define SLEEP_TIME_MS 1
 
 #define LOG_MODULE_NAME peripheral_uart
-LOG_MODULE_REGISTER(LOG_MODULE_NAME);
+LOG_MODULE_REGISTER(LOG_MODULE_NAME, LOG_LEVEL_DBG);
 
 #define STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
 #define PRIORITY 7
@@ -615,6 +615,7 @@ static void configure_gpio(void)
 
 void main(void)
 {
+    LOG_INF("nRF Connect SDK Fundamentals");
 	int blink_status = 0;
 	uint32_t period = MAX_PERIOD;
 	int err = 0;

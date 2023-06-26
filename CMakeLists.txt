@@ -24,8 +24,8 @@ target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/ceva_fsmSH2.c)
 # Include SH2
 #target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/shtp.c)
 #target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2.c)
-#target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2_util.c)
-#target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2_SEnsorValue.c)
+target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2_util.c)
+target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2_SensorValue.c)
 
 
 # Include UART ASYNC API adapter

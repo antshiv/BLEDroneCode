@@ -12,7 +12,7 @@ struct spi_cs_control spim_cs = {
 const struct spi_config spi_cfg = {
     .operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
                  SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_HOLD_ON_CS,
-    .frequency = 500000,//1000000,
+    .frequency = 500000,//500000,//1000000,
     .slave = 0,
     .cs = &spim_cs,
 };
