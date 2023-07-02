@@ -8,12 +8,13 @@
  *  @brief Nordic UART Bridge Service (NUS) sample
  */
 #include "includes.h"
+#include "commands.h"
 #include "drivers/PWM/pwm_local.h"
 #include "drivers/SPIM/spim_local.h"
 #include "drivers/GPIO_INPUT/gpio_input_local.h"
 
 /*** include sensors */
-//#include "sensors/IMU_CEVA_FSM300/ceva_fsm300.h"
+// #include "sensors/IMU_CEVA_FSM300/ceva_fsm300.h"
 #include "sensors/IMU_CEVA_FSM300/ceva_fsmSH2.h"
 
 #define SLEEP_TIME_MS 1
@@ -22,7 +23,7 @@
 LOG_MODULE_REGISTER(LOG_MODULE_NAME, LOG_LEVEL_DBG);
 
 #define STACKSIZE CONFIG_BT_NUS_THREAD_STACK_SIZE
-#define PRIORITY 7
+#define PRIORITY 6
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
@@ -494,8 +495,27 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 {
 	int err;
 	char addr[BT_ADDR_LE_STR_LEN] = {0};
+	bleISRComplete = false;
 
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr, ARRAY_SIZE(addr));
+
+	/* free the previous feed and len and reset to clean state */
+	if (ble_received_data)
+	{
+		k_free(ble_received_data);
+		ble_received_data = NULL;
+		ble_received_data_len = 0;
+		commandReceived = false;
+	}
+	ble_received_data = k_calloc(len, sizeof(uint8_t));
+	if (!ble_received_data)
+	{
+		printk("Not able to allocate BLE receive data buffer");
+		return;
+	}
+	memcpy(ble_received_data, data, len);
+	ble_received_data_len = len;
+	commandReceived = true;
 
 	LOG_INF("Received data from: %s", addr);
 
@@ -540,6 +560,7 @@ static void bt_receive_cb(struct bt_conn *conn, const uint8_t *const data,
 			k_fifo_put(&fifo_uart_tx_data, tx);
 		}
 	}
+	bleISRComplete = true;
 }
 
 static struct bt_nus_cb nus_cb = {
@@ -615,7 +636,7 @@ static void configure_gpio(void)
 
 void main(void)
 {
-    LOG_INF("nRF Connect SDK Fundamentals");
+	LOG_INF("nRF Connect SDK Fundamentals");
 	int blink_status = 0;
 	uint32_t period = MAX_PERIOD;
 	int err = 0;
@@ -623,7 +644,7 @@ void main(void)
 
 	configure_gpio();
 	err = gpio_pin_configure_dt(&fsmbootn, GPIO_OUTPUT);
-	//err = gpio_pin_configure_dt(&fsmwaken, GPIO_OUTPUT);
+	// err = gpio_pin_configure_dt(&fsmwaken, GPIO_OUTPUT);
 	printk("Set up button at %s pin %d\n", fsmbootn.port->name, fsmbootn.pin);
 	if (err)
 	{
@@ -750,15 +771,16 @@ void main(void)
 	}
 
 	// Initialize the demo app (creates FreeRTOS tasks for app)
-	//demo_init();
+	// demo_init();
 	ceva_fsmSH2_Open();
-	//FSM_init();
+	//process_command_thread();
+	// FSM_init();
 
 	for (;;)
 	{
 		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
 		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
-		//demo_service();
+		// demo_service();
 		/* Interfacting with sensor using SPI */
 		// err = gpio_pin_toggle_dt(&spi4_cs);
 		// if (err < 0)
@@ -795,6 +817,12 @@ void ble_write_thread(void)
 		k_yield();
 	}
 }
+
+K_THREAD_DEFINE(THREAD0_ID, STACKSIZE, thread0, NULL, NULL,
+				NULL, PRIORITY, 0, 0);
+
+K_THREAD_DEFINE(process_command_thread_id, STACKSIZE, process_command_thread, NULL, NULL,
+				NULL, 7, 0, 0);
 
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
