@@ -1,8 +1,8 @@
 
-.. _peripheral_uart:
 
-Bluetooth: Drone code Using NoricSemi Peripheral UART
-##########################
+# Bluetooth: Drone code Using NoricSemi Peripheral UART
+
+-------------------------------------------------------
 
 This repository contains the code for the drone. The code runs on the zephyr RTOS and uses the NordicSemi Peripheral UART as the base code base.
 
