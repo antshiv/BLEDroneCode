@@ -654,8 +654,8 @@ void main(void)
 	pwm_check_ready();
 
 	// calibratePWM(MAX_PERIOD);
-	setDuty(pwm_led0, period, period / 2U);
-	setDuty(pwm_led1, period, period / 2U);
+	setDuty(pwm_led0, period, period / 10U);
+	setDuty(pwm_led1, period, period / 10U);
 	setDuty(pwm_led2, period, period / 10U);
 	setDuty(pwm_led3, period, period / 10U);
 
@@ -818,7 +818,7 @@ void ble_write_thread(void)
 	}
 }
 
-K_THREAD_DEFINE(THREAD0_ID, STACKSIZE, thread0, NULL, NULL,
+K_THREAD_DEFINE(THREAD0_ID, STACKSIZE, process_command, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(process_command_thread_id, STACKSIZE, process_command_thread, NULL, NULL,

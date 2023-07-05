@@ -22,9 +22,23 @@ void process_command_thread(void)
     }
 }
 
-void thread0(void)
+static uint8_t getPWM(uint8_t *token)
 {
-    printk("thread0\n");
+    int count = 0;
+    while (token != NULL)
+    {
+        if (count) {
+            printf("The pwm speed is 0x%x or %d% \n", atoi(token), atoi(token));
+            return atoi(token);
+        }
+        count++;
+        token = strtok(NULL, " ");
+    }
+}
+
+void process_command(void)
+{
+    printk("Process command thread\n");
     while (1)
     {
         if (commandReceived && bleISRComplete)
@@ -40,31 +54,23 @@ void thread0(void)
                 {
                 case HARD_STOP:
                     printf("the data received is 0x01 - Hard Stop \n");
+                    setDuty(pwm_led0, MAX_PERIOD, (MAX_PERIOD  / 10U));
+                    setDuty(pwm_led1, MAX_PERIOD, (MAX_PERIOD  / 10U));
+                    setDuty(pwm_led2, MAX_PERIOD, (MAX_PERIOD  / 10U));
+                    setDuty(pwm_led3, MAX_PERIOD, (MAX_PERIOD  / 10U));
                     break;
                 case TEST_MOTOR_1:
-                    while (token != NULL)
-                    {
-                        printf("The pwm speed is 0x%x or %d% \n", atoi(token), atoi(token));
-                        token = strtok(NULL, " ");
-                    }
+                    setDuty(pwm_led0, MAX_PERIOD, (MAX_PERIOD * getPWM(token)) / 100U);
+                    break;
                 case TEST_MOTOR_2:
-                    while (token != NULL)
-                    {
-                        printf("The pwm speed is 0x%x or %d% \n", atoi(token), atoi(token));
-                        token = strtok(NULL, " ");
-                    }
+                    setDuty(pwm_led1, MAX_PERIOD, (MAX_PERIOD * getPWM(token)) / 100U);
+                    break;
                 case TEST_MOTOR_3:
-                    while (token != NULL)
-                    {
-                        printf("The pwm speed is 0x%x or %d% \n", atoi(token), atoi(token));
-                        token = strtok(NULL, " ");
-                    }
+                    setDuty(pwm_led2, MAX_PERIOD, (MAX_PERIOD * getPWM(token)) / 100U);
+                    break;
                 case TEST_MOTOR_4:
-                    while (token != NULL)
-                    {
-                        printf("The pwm speed is 0x%x or %d% \n", atoi(token), atoi(token));
-                        token = strtok(NULL, " ");
-                    }
+                    setDuty(pwm_led3, MAX_PERIOD, (MAX_PERIOD * getPWM(token)) / 100U);
+                    break;
                 default:
                     break;
                 }

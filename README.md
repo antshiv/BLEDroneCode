@@ -1,6 +1,4 @@
-
-
-# Bluetooth: Drone code Using NoricSemi Peripheral UART
+# Drone code Using NordicSemi NRF5340 with Bluetooth BLE
 
 -------------------------------------------------------
 

@@ -1,13 +1,9 @@
 #include <zephyr/drivers/pwm.h>
 
-/*
- * Initialize the device driver for PWM_0, PWM_1, PWM_2, PWM_3
- * PWM signal is required to control the ESC of the drone.
- */
-static const struct pwm_dt_spec pwm_led0 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
-static const struct pwm_dt_spec pwm_led1 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
-static const struct pwm_dt_spec pwm_led2 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
-static const struct pwm_dt_spec pwm_led3 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
+extern const struct pwm_dt_spec pwm_led0;
+extern const struct pwm_dt_spec pwm_led1;
+extern const struct pwm_dt_spec pwm_led2;
+extern const struct pwm_dt_spec pwm_led3;
 /*
  * For the ESC, the duty cycle is set to 8000, which is the minimum value
  * for the ESC to recognize the signal. The frequency is set to 50Hz, which

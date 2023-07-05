@@ -1,4 +1,5 @@
 #include "includes.h"
+#include "drivers/PWM/pwm_local.h"
 
 extern uint8_t *ble_received_data;
 extern uint16_t ble_received_data_len;
@@ -6,7 +7,7 @@ extern bool commandReceived;
 extern bool bleISRComplete;
 
 void process_command_thread(void);
-void thread0(void);
+void process_command(void);
 
 #define HARD_STOP 0x01
 #define FETCH_RAW_READINGS 0x02

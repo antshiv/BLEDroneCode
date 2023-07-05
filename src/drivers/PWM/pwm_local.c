@@ -1,6 +1,15 @@
 #include "../../includes.h"
 #include "pwm_local.h"
 
+/*
+ * Initialize the device driver for PWM_0, PWM_1, PWM_2, PWM_3
+ * PWM signal is required to control the ESC of the drone.
+ */
+const struct pwm_dt_spec pwm_led0 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
+const struct pwm_dt_spec pwm_led1 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
+const struct pwm_dt_spec pwm_led2 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
+const struct pwm_dt_spec pwm_led3 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
+
 uint16_t pwm_seq[4] = {PWM_CH0_DUTY, PWM_CH1_DUTY, PWM_CH2_DUTY, PWM_CH3_DUTY};
 
 void pwm_check_ready()
