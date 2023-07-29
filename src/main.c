@@ -654,10 +654,10 @@ void main(void)
 	pwm_check_ready();
 
 	// calibratePWM(MAX_PERIOD);
-	setDuty(pwm_led0, period, period / 10U);
-	setDuty(pwm_led1, period, period / 10U);
-	setDuty(pwm_led2, period, period / 10U);
-	setDuty(pwm_led3, period, period / 10U);
+	setDuty(pwm_led0, period, period / 20U);
+	setDuty(pwm_led1, period, period / 20U);
+	setDuty(pwm_led2, period, period / 20U);
+	setDuty(pwm_led3, period, period / 20U);
 
 	spi_init();
 	k_msleep(500);
@@ -773,8 +773,8 @@ void main(void)
 	// Initialize the demo app (creates FreeRTOS tasks for app)
 	// demo_init();
 	ceva_fsmSH2_Open();
-	//process_command_thread();
-	// FSM_init();
+	// process_command_thread();
+	//  FSM_init();
 
 	for (;;)
 	{
@@ -817,6 +817,20 @@ void ble_write_thread(void)
 		k_yield();
 	}
 }
+
+void floattest(void) {
+
+	float f = 0.0;
+	int i = 0;
+	printf("PI is %f\n", M_PI);
+	for (i = 0; i < 100; i++) {
+		f = f + 0.1;
+		printf("f = %f\n", f);
+	}
+}
+
+K_THREAD_DEFINE(floattest_ID, STACKSIZE, floattest, NULL, NULL,
+				NULL, PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(THREAD0_ID, STACKSIZE, process_command, NULL, NULL,
 				NULL, PRIORITY, 0, 0);

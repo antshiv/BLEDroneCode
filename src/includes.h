@@ -27,3 +27,7 @@
 #include <stdio.h>
 
 #include <zephyr/logging/log.h>
+
+#define _USE_MATH_DEFINES
+#define __BSD_VISIBLE 1
+#include  <math.h>

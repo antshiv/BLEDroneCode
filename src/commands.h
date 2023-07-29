@@ -25,3 +25,5 @@ void process_command(void);
 #define LOWER 0x0E
 #define STOP_SENSOR_STREAN 0x0F
 #define TOGGLE_LOGGING 0x2f
+#define TEST_MODE_ON 0x3f
+#define TEST_MODE_OFF 0x4f
