@@ -20,6 +20,8 @@
 #include <zephyr/settings/settings.h>
 #include <zephyr/usb/usb_device.h>
 
+#include <zephyr/drivers/sensor.h>
+
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <soc.h>

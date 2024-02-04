@@ -11,11 +11,13 @@
 #include "commands.h"
 #include "drivers/PWM/pwm_local.h"
 #include "drivers/SPIM/spim_local.h"
+#include "drivers/TWIM/twim_local.h"
 #include "drivers/GPIO_INPUT/gpio_input_local.h"
 
 /*** include sensors */
 // #include "sensors/IMU_CEVA_FSM300/ceva_fsm300.h"
 #include "sensors/IMU_CEVA_FSM300/ceva_fsmSH2.h"
+#include "sensors/PowerMeter_TI_INA228/INA228.h"
 
 #define SLEEP_TIME_MS 1
 
@@ -662,6 +664,8 @@ void main(void)
 	spi_init();
 	k_msleep(500);
 
+	twim_init();
+
 	/* configure input GPIO to sense IMU interrupt*/
 	/**********************************************/
 
@@ -775,11 +779,11 @@ void main(void)
 	ceva_fsmSH2_Open();
 	// process_command_thread();
 	//  FSM_init();
-
+	int rc;
 	for (;;)
 	{
-		dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
-		k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
+	//	dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
+	//	k_sleep(K_MSEC(RUN_LED_BLINK_INTERVAL));
 		// demo_service();
 		/* Interfacting with sensor using SPI */
 		// err = gpio_pin_toggle_dt(&spi4_cs);
@@ -792,7 +796,17 @@ void main(void)
 		// err = gpio_pin_toggle_dt(&spi4_cs);
 		/* end sending info using SPI */
 
-		k_sleep(K_SECONDS(4U));
+		//sensor_channel_get(dev_i2c1.bus, SENSOR_CHAN_VOLTAGE, &v_bus);
+		/*
+		uint8_t config[2] = {0x03,0x8C};
+		ret = i2c_write_dt(&dev_i2c1, config, sizeof(config));
+		if(ret != 0){
+			printk("Failed to write to I2C device address %x at reg. %x \n\r", dev_i2c1.addr,config[0]);
+		} else {
+			printk("Wrote to I2C device address %x at reg. %x \n\r", dev_i2c1.addr,config[0]);
+		}
+		*/
+		k_sleep(K_SECONDS(1U));
 	}
 }
 
@@ -842,4 +856,7 @@ K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
+				NULL, PRIORITY, 0, 0);
+
+K_THREAD_DEFINE(Power_monitor_id, STACKSIZE, power_monitor_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);

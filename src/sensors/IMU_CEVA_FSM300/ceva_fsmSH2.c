@@ -527,7 +527,7 @@ static void SHInputHandler(uint8_t *payload, uint16_t len, uint32_t timestamp)
                 event.reportId = reportId;
                 memcpy(event.report, pReport, reportLen);
                 event.len = reportLen;
-                printk("next packet info : %x, len %d\n", payload[cursor], event.len);
+                //printk("next packet info : %x, len %d\n", payload[cursor], event.len);
                 printEvent(&event);
                 // if (pSh2->sensorCallback != 0) {
                 // pSh2->sensorCallback(pSh2->sensorCookie, &event);

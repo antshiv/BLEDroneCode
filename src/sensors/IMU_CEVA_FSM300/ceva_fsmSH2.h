@@ -26,7 +26,7 @@ typedef enum SpiState_e
     SPI_RD_HDR,
     SPI_RD_BODY,
     SPI_WRITE
-} SpiState_t;
+} SpiState_t; 
 
 // Maximum SHTP Transfer and Payload sizes
 #define SH2_HAL_MAX_TRANSFER_OUT (128)
