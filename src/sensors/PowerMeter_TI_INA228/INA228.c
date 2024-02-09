@@ -345,13 +345,16 @@ double INA228_getCHARGE_C(INA228_Handle sensor)
 
 void power_monitor_thread() {
     int rc;
-    float v_bus, power, current, die_temp;
+    float v_bus, power, current, die_temp, shunt_v, energy, charge;
     INA228_config(INA228);
     for (;;) { 
         die_temp = INA228_getDIETEMP_C(INA228);
         v_bus = INA228_getVBUS_V(INA228);
-        power = INA228_getPOWER_W(INA228);
         current = INA228_getCURRENT_A(INA228);
+        power = INA228_getPOWER_W(INA228);
+        shunt_v = INA228_getVSHUNT_mV(INA228);
+        energy = INA228_getENERGY_J(INA228);
+        charge = INA228_getCHARGE_C(INA228);
 
         printf("Die Temp: %f [C] -- "
             "Bus: %f [V] -- "
@@ -361,6 +364,12 @@ void power_monitor_thread() {
                v_bus,
                power,
                current);
+        printf("Shunt Voltage: %f [mV] -- "
+            "Energy: %f [J] -- "
+            "Charge: %f [C]\n",
+               shunt_v,
+               energy,
+               charge);       
         k_sleep(K_MSEC(1000)); 
     }
 }

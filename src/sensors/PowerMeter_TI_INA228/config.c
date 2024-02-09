@@ -43,7 +43,7 @@ static INA228_State INA228_state = {
     .pwrLimitRegister = 0xFFFFU,
 
     .adcrange = INA228_config_register_adcrange_16384mV, 
-    .currentlsb = 0,
+    .currentlsb = 0.00001,
 
     /* Sensor's I2C bus ID and address */
     .busId = 0,
