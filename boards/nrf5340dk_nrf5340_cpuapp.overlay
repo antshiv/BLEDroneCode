@@ -130,6 +130,13 @@ arduino_spi: &spi4 {
 		lsb-microamp = <10>;
 		label = "INA228";
 	};
+
+	bmp585: bmp585@46 {
+		status = "okay";
+		compatible = "bosch,bmp585";
+		reg = <0x46>;
+		label = "BMP585";
+	};
 	
 	ina219: ina219@45 {
 		status = "okay";

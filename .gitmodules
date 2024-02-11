@@ -1,3 +1,6 @@
 [submodule "src/sensors/IMU_CEVA_FSM300/sh2"]
 	path = src/sensors/IMU_CEVA_FSM300/sh2
 	url = https://github.com/ceva-dsp/sh2.git
+[submodule "src/sensors/AbsoluteBarometricPressure_BMP585/BMP5-Sensor-API"]
+	path = src/sensors/AbsoluteBarometricPressure_BMP585/BMP5-Sensor-API
+	url = https://github.com/boschsensortec/BMP5-Sensor-API.git

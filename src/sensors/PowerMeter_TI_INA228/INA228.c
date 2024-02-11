@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 #include "INA228.h"
-#include "mcu.h"
+#include "../../drivers/TWIM/mcu.h"
 #include "config.h" /* for sensor handle names */
 
 #define MSB(u16) (((u16) & 0xFF00U) >> 8)

@@ -15,6 +15,7 @@ target_sources(app PRIVATE
 target_sources(app PRIVATE src/drivers/PWM/pwm_local.c)
 target_sources(app PRIVATE src/drivers/SPIM/spim_local.c)
 target_sources(app PRIVATE src/drivers/TWIM/twim_local.c)
+target_sources(app PRIVATE src/drivers/TWIM/mcu.c)
 target_sources(app PRIVATE src/drivers/GPIO_INPUT/gpio_input_local.c)
 
 # Include sensors 
@@ -30,10 +31,13 @@ target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2_util.c)
 target_sources(app PRIVATE src/sensors/IMU_CEVA_FSM300/sh2/sh2_SensorValue.c)
 
 #Include Power Meter
-target_sources(app PRIVATE src/sensors/PowerMeter_TI_INA228/mcu.c)
 target_sources(app PRIVATE src/sensors/PowerMeter_TI_INA228/INA228.c)
 target_sources(app PRIVATE src/sensors/PowerMeter_TI_INA228/config.c)
 
+#Include Absolute Barometric Pressure Sensor
+target_sources(app PRIVATE src/sensors/AbsoluteBarometricPressure_BMP585/common.c)
+target_sources(app PRIVATE src/sensors/AbsoluteBarometricPressure_BMP585/BMP5-Sensor-API/bmp5.c)
+target_sources(app PRIVATE src/sensors/AbsoluteBarometricPressure_BMP585/read_sensor_data_normal_mode.c)
 
 # Include UART ASYNC API adapter
 target_sources_ifdef(CONFIG_BT_NUS_UART_ASYNC_ADAPTER app PRIVATE

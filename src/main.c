@@ -18,6 +18,7 @@
 // #include "sensors/IMU_CEVA_FSM300/ceva_fsm300.h"
 #include "sensors/IMU_CEVA_FSM300/ceva_fsmSH2.h"
 #include "sensors/PowerMeter_TI_INA228/INA228.h"
+#include "sensors/AbsoluteBarometricPressure_BMP585/common.h"
 
 #define SLEEP_TIME_MS 1
 
@@ -843,8 +844,8 @@ void floattest(void) {
 	}
 }
 
-K_THREAD_DEFINE(floattest_ID, STACKSIZE, floattest, NULL, NULL,
-				NULL, PRIORITY, 0, 0);
+//K_THREAD_DEFINE(floattest_ID, STACKSIZE, floattest, NULL, NULL,
+//				NULL, PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(THREAD0_ID, STACKSIZE, process_command, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
@@ -859,4 +860,7 @@ K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
 
 K_THREAD_DEFINE(Power_monitor_id, STACKSIZE, power_monitor_thread, NULL, NULL,
+				NULL, PRIORITY, 0, 0);
+
+K_THREAD_DEFINE(Barometer_id, STACKSIZE, barometer_normal_mode_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
