@@ -19,6 +19,7 @@
 #include "sensors/IMU_CEVA_FSM300/ceva_fsmSH2.h"
 #include "sensors/PowerMeter_TI_INA228/INA228.h"
 #include "sensors/AbsoluteBarometricPressure_BMP585/common.h"
+#include "sensors/TOF_ST_VL53L8/tof_vl53l8.h"
 
 #define SLEEP_TIME_MS 1
 
@@ -856,11 +857,14 @@ K_THREAD_DEFINE(process_command_thread_id, STACKSIZE, process_command_thread, NU
 K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 				NULL, PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
-				NULL, PRIORITY, 0, 0);
+//K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
+//				NULL, PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(Power_monitor_id, STACKSIZE, power_monitor_thread, NULL, NULL,
-				NULL, PRIORITY, 0, 0);
+//K_THREAD_DEFINE(Power_monitor_id, STACKSIZE, power_monitor_thread, NULL, NULL,
+//				NULL, PRIORITY, 0, 0);
 
-K_THREAD_DEFINE(Barometer_id, STACKSIZE, barometer_normal_mode_thread, NULL, NULL,
-				NULL, PRIORITY, 0, 0);
+//K_THREAD_DEFINE(Barometer_id, STACKSIZE, barometer_normal_mode_thread, NULL, NULL,
+//				NULL, PRIORITY, 0, 0);
+
+K_THREAD_DEFINE(TOF_VL53L8, 16384*3, tof_vl5318_thread, NULL, NULL,
+				NULL, 5, 0, 0);

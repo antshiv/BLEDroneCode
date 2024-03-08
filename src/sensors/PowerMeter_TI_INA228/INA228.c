@@ -370,6 +370,7 @@ void power_monitor_thread() {
                shunt_v,
                energy,
                charge);       
+        k_yield();
         k_sleep(K_MSEC(1000)); 
     }
 }

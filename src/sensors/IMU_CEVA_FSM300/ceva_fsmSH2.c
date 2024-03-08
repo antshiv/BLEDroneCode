@@ -567,15 +567,15 @@ void FSM_thread(void)
                 /* send an header to see how much is the packet load */
                 spi_write_msg(len, txBuf, rxBuf);
                 packet_length = rxBuf[1] << 8 | rxBuf[0];
-                printk("Packet length: %d\n", packet_length);
-                k_msleep(SLEEP_TIME_MS * 0.01);
+                //printk("Packet length: %d\n", packet_length);
+                k_msleep(SLEEP_TIME_MS);
                 /* the paylaod data */
                 spi_write_msg(packet_length - packet_hdr_length, txBuf, rxBuf + 4);
                 // printk("Packet data[0]: %x\n", rxBuf[4]);
                 spi_release(spi_dev, &spi_cfg);
                 if (resetComplete)
                 {
-                    printk("Event received: rxBuf[4]: %x\n", rxBuf[4]);
+                    //printk("Event received: rxBuf[4]: %x\n", rxBuf[4]);
                     SHInputHandler(&rxBuf[4], packet_length - 4, k_uptime_get());
                     // printEvent(&rxBuf[4]);
                 }
@@ -590,7 +590,7 @@ void FSM_thread(void)
         {
             // printk('buffer lenght is %d', txBuf[0]);
         }
-
+        k_msleep(SLEEP_TIME_MS);
         k_yield();
     }
 }

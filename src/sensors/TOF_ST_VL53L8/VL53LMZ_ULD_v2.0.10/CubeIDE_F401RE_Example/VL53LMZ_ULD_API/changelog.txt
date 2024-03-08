@@ -1,0 +1,39 @@
+********************************************************************************
+*
+* STMicroelectronics - VL53L7CH/VL53L8CH Ultra Lite Driver
+*
+********************************************************************************
+
+# Driver version history 
+
+---------------------------------------------------------------------------------------------------------------
+Version : 2.0.10
+Date: 07/12/2023
+Comments :
+- Fixed wrong conversion of Ambient and Histogram values in Example_12. Values were a factor of 2x too low.
+- Fixed incorrect sizing of cnh_data_buffer_t.
+- Fixed incorrect comparison for is_auto_stop_enabled.
+- Added VL53LMZ_POWER_MODE_DEEP_SLEEP mode.
+- Include MM FW v1.7 which contains:
+.... Improved rad2perp for L8
+.... Improved wrap-around check algo
+.... Option to skip intr on first two frames of detection thresholds
+.... Calculation of a FW checksum
+.... Fix for incorrect operation with very negative values of CNH start_bin
+.... Added first_bin to sci_persistent_data[2][31:16]
+---------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------
+Version : 2.0.9
+Date : 25/07/2023
+Comments :
+- Fixed issue in  vl53lmz_enable/disable_internal_cp functions which prevented use with VL53L7CH.
+- Added module_type to VL53LMZ_Configuration to provide a public location to read the module type. This
+field is set during calls to vl53lmz_is_alive() and vl53lmz_init().
+---------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------
+Version : 2.0.8
+Date : 16/06/2023
+Comments : Initial driver release.
+---------------------------------------------------------------------------------------------------------------

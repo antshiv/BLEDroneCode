@@ -68,6 +68,7 @@ void barometer_normal_mode_thread(void)
             for(;;) {
                 rslt = get_sensor_data(&osr_odr_press_cfg, &dev);
                 bmp5_error_codes_print_result("get_sensor_data", rslt);
+                k_yield();
                 k_sleep(K_MSEC(1000));
             }
         }
@@ -152,7 +153,7 @@ static int8_t get_sensor_data(const struct bmp5_osr_odr_press_config *osr_odr_pr
     printf("\nOutput :\n\n");
     printf("Data, Pressure (Pa), Temperature (deg C)\n");
 
-    while (idx < 50)
+    while (idx < 1)
     {
         rslt = bmp5_get_interrupt_status(&int_status, dev);
         bmp5_error_codes_print_result("bmp5_get_interrupt_status", rslt);

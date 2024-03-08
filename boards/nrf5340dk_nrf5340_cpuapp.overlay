@@ -65,6 +65,30 @@
 			label = "FSM WAKEN";
 		};
 	};
+
+	spi_i2c_n {
+		compatible = "gpio-leds";
+		spi_i2c_n: spi_i2c_n {
+			gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;	/* D6 */
+			label = "SPI I2C N";
+		};
+	};
+
+	LPn {
+		compatible = "gpio-leds";
+		LPn: LPn {
+			gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;	/* D5 */
+			label = "LPn";
+		};
+	};
+
+	pwren {
+		compatible = "gpio-leds";
+		pwren: pwren {
+			gpios = <&gpio0 27 GPIO_ACTIVE_HIGH>;	/* D4 */
+			label = "PWREN";
+		};
+	};
     
     buttons {
 		compatible = "gpio-keys";
@@ -89,6 +113,9 @@
 		fsmwaken = &fsmwaken;
 		sw0 = &button0;
         led2 = &led2;
+		spii2cn = &spi_i2c_n;
+		lpn = &LPn;
+		pwren = &pwren;
      };
 
 };
@@ -115,7 +142,7 @@ arduino_spi: &spi4 {
 &i2c1 {
 	status = "okay";
     compatible = "nordic,nrf-twim";
-	clock-frequency = <I2C_BITRATE_FAST>;
+	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
     pinctrl-0 = <&i2c1_default>;
 
 	ina228:ina228@45 {
@@ -136,6 +163,14 @@ arduino_spi: &spi4 {
 		compatible = "bosch,bmp585";
 		reg = <0x46>;
 		label = "BMP585";
+	};
+	
+	vl53l8_1: vl53l8_1@29 {
+		status = "okay";
+		compatible = "st,vl53l8";
+		reg = <0x29>;
+		label = "VL53L8_1";
+		//scl-timeout-us = <100000000>;
 	};
 	
 	ina219: ina219@45 {

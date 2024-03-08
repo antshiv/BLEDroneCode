@@ -39,6 +39,24 @@ target_sources(app PRIVATE src/sensors/AbsoluteBarometricPressure_BMP585/common.
 target_sources(app PRIVATE src/sensors/AbsoluteBarometricPressure_BMP585/BMP5-Sensor-API/bmp5.c)
 target_sources(app PRIVATE src/sensors/AbsoluteBarometricPressure_BMP585/read_sensor_data_normal_mode.c)
 
+#Include TOF sensor
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/tof_vl53l8.c)
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53LMZ_ULD_v2.0.10/Platform/platform.c)
+
+#target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53LMZ_ULD_v2.0.10/VL53LMZ_ULD_API/src/vl53lmz_api.c)
+#target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53LMZ_ULD_v2.0.10/VL53LMZ_ULD_API/src/vl53lmz_plugin_cnh.c)
+#target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53LMZ_ULD_v2.0.10/VL53LMZ_ULD_API/src/vl53lmz_plugin_detection_thresholds.c)
+#target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53LMZ_ULD_v2.0.10/VL53LMZ_ULD_API/src/vl53lmz_plugin_motion_indicator.c)
+#target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53LMZ_ULD_v2.0.10/VL53LMZ_ULD_API/src/vl53lmz_plugin_xtalk.c)
+#target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/Example_11_motion_indicator_with_detection_thresholds.c)
+
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/src/vl53l8cx_api.c)
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/src/vl53l8cx_plugin_detection_thresholds.c)
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/src/vl53l8cx_plugin_motion_indicator.c)
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/src/vl53l8cx_plugin_xtalk.c)
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/Example_11_motion_indicator_with_detection_thresholds_VL53L8CX.c)
+target_sources(app PRIVATE src/sensors/TOF_ST_VL53L8/Example_1_ranging_basic.c)
+
 # Include UART ASYNC API adapter
 target_sources_ifdef(CONFIG_BT_NUS_UART_ASYNC_ADAPTER app PRIVATE
   src/uart_async_adapter.c
