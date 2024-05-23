@@ -228,13 +228,17 @@ uint8_t vl53l8cx_is_alive(
 	status |= RdByte(&(p_dev->platform), 0, &device_id);
 	status |= RdByte(&(p_dev->platform), 1, &revision_id);
 	status |= WrByte(&(p_dev->platform), 0x7fff, 0x02);
+	
+	printk("The device id is 0x%x and the revision id is 0x%x\n", device_id, revision_id);
 
 	if((device_id == (uint8_t)0xF0) && (revision_id == (uint8_t)0x0C))
 	{
+		printk("The device is alive\n");
 		*p_is_alive = 1;
 	}
 	else
 	{
+		printk("The device is not alive\n");
 		*p_is_alive = 0;
 	}
 
@@ -322,6 +326,7 @@ uint8_t vl53l8cx_init(
 	status |= WrByte(&(p_dev->platform), 0x20, 0x06);
 
 	/* Download FW into VL53L8CX */
+	status |= WaitMs(&(p_dev->platform), 400);
 	status |= WrByte(&(p_dev->platform), 0x7fff, 0x09);
 	status |= WrMulti(&(p_dev->platform),0,
 		(uint8_t*)&VL53L8CX_FIRMWARE[0],0x8000);

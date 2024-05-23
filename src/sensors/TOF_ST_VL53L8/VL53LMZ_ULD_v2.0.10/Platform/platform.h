@@ -67,6 +67,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "../../../../includes.h"
+#include "../../../../drivers/TWIM/mcu.h"
 
 /**
  * @brief Structure VL53LMZ_Platform needs to be filled by the customer,

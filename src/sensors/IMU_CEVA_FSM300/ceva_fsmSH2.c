@@ -6,6 +6,17 @@
 const struct gpio_dt_spec fsmrstn = GPIO_DT_SPEC_GET(DT_ALIAS(fsmrstn), gpios);
 const struct gpio_dt_spec fsmbootn = GPIO_DT_SPEC_GET(DT_ALIAS(fsmbootn), gpios);
 const struct gpio_dt_spec fsmwaken = GPIO_DT_SPEC_GET(DT_ALIAS(fsmwaken), gpios);
+struct spi_cs_control ceva_spi_cs = {
+    .gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(reg_my_spi_master)),
+    .delay = 0,
+};
+const struct spi_config ceva_spi_cfg = {
+    .operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
+                 SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_HOLD_ON_CS,
+    .frequency = 500000,//500000,//1000000,
+    .slave = 0,
+    .cs = &ceva_spi_cs,
+};
 
 #define RESET_DELAY_US (10000)
 #define SLEEP_TIME_MS 1
@@ -202,8 +213,8 @@ int sh2_setSensorConfig(sh2_SensorId_t sensorId, const sh2_SensorConfig_t *pConf
     txBuf[3] = 0;
     memcpy(&txBuf[4], &report, 17);
     // printk('write to spi');
-    spi_write_msg(17 + 4, txBuf, rxBuf);
-    spi_release(spi_dev, &spi_cfg);
+    spi_write_msg(&ceva_spi_cfg, 17 + 4, txBuf, rxBuf);
+    spi_release(spi_dev, &ceva_spi_cfg);
     spiState = SPI_IDLE;
     // k_sleep(K_MSEC(1U));
     // waken(false);
@@ -269,8 +280,8 @@ static void ceva_fsmSH2_dummy()
     /* send dummy SPI */
     uint8_t tx_buffer[1] = {0xAA};
     uint8_t rx_buffer[1] = {0x00};
-    spi_write_msg(1, tx_buffer, rx_buffer);
-    spi_release(spi_dev, &spi_cfg);
+    spi_write_msg(&ceva_spi_cfg, 1, tx_buffer, rx_buffer);
+    spi_release(spi_dev, &ceva_spi_cfg);
     k_usleep(RESET_DELAY_US);
 
     // Deassert reset, boot in non-DFU mode
@@ -565,14 +576,14 @@ void FSM_thread(void)
                 memset(txBuf, 0, SH2_HAL_MAX_TRANSFER_IN);
 
                 /* send an header to see how much is the packet load */
-                spi_write_msg(len, txBuf, rxBuf);
+                spi_write_msg(&ceva_spi_cfg, len, txBuf, rxBuf);
                 packet_length = rxBuf[1] << 8 | rxBuf[0];
                 //printk("Packet length: %d\n", packet_length);
                 k_msleep(SLEEP_TIME_MS);
                 /* the paylaod data */
-                spi_write_msg(packet_length - packet_hdr_length, txBuf, rxBuf + 4);
+                spi_write_msg(&ceva_spi_cfg, packet_length - packet_hdr_length, txBuf, rxBuf + 4);
                 // printk("Packet data[0]: %x\n", rxBuf[4]);
-                spi_release(spi_dev, &spi_cfg);
+                spi_release(spi_dev, &ceva_spi_cfg);
                 if (resetComplete)
                 {
                     //printk("Event received: rxBuf[4]: %x\n", rxBuf[4]);

@@ -11,5 +11,7 @@ extern const struct spi_config spi_cfg;
 extern struct spi_cs_control spim_cs;
 
 void spi_init(void);
-int spi_write_test_msg(void);
-void spi_write_msg(uint16_t len, uint8_t *tx_data, uint8_t *rx_data);
+// int spi_write_test_msg(void);
+int spi_write_test_msg(const struct spi_config *spi_cfg);
+// void spi_write_msg(const struct spi_cfg *spi_cfg, uint16_t len, uint8_t *tx_data, uint8_t *rx_data);
+int spi_write_msg(const struct spi_config *spi_cfg, uint16_t len, uint8_t *tx_buffer, uint8_t *rx_buffer);

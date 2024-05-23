@@ -638,10 +638,9 @@ static void configure_gpio(void)
 	}
 }
 
-void main(void)
+int main(void)
 {
 	LOG_INF("nRF Connect SDK Fundamentals");
-	int blink_status = 0;
 	uint32_t period = MAX_PERIOD;
 	int err = 0;
 	int ret;
@@ -735,14 +734,14 @@ void main(void)
 		if (err)
 		{
 			printk("Failed to register authorization callbacks.\n");
-			return;
+			return 0;
 		}
 
 		err = bt_conn_auth_info_cb_register(&conn_auth_info_callbacks);
 		if (err)
 		{
 			printk("Failed to register authorization info callbacks.\n");
-			return;
+			return 0;
 		}
 	}
 
@@ -765,7 +764,7 @@ void main(void)
 	if (err)
 	{
 		LOG_ERR("Failed to initialize UART service (err: %d)", err);
-		return;
+		return 0;
 	}
 
 	err = bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), sd,
@@ -773,15 +772,14 @@ void main(void)
 	if (err)
 	{
 		LOG_ERR("Advertising failed to start (err %d)", err);
-		return;
+		return 0;
 	}
 
 	// Initialize the demo app (creates FreeRTOS tasks for app)
 	// demo_init();
-	ceva_fsmSH2_Open();
+	ret = ceva_fsmSH2_Open();
 	// process_command_thread();
 	//  FSM_init();
-	int rc;
 	for (;;)
 	{
 	//	dk_set_led(RUN_STATUS_LED, (++blink_status) % 2);
@@ -810,6 +808,7 @@ void main(void)
 		*/
 		k_sleep(K_SECONDS(1U));
 	}
+	return 0;
 }
 
 void ble_write_thread(void)
@@ -860,8 +859,8 @@ K_THREAD_DEFINE(ble_write_thread_id, STACKSIZE, ble_write_thread, NULL, NULL,
 //K_THREAD_DEFINE(FSM_thread_id, STACKSIZE, FSM_thread, NULL, NULL,
 //				NULL, PRIORITY, 0, 0);
 
-//K_THREAD_DEFINE(Power_monitor_id, STACKSIZE, power_monitor_thread, NULL, NULL,
-//				NULL, PRIORITY, 0, 0);
+K_THREAD_DEFINE(Power_monitor_id, STACKSIZE, power_monitor_thread, NULL, NULL,
+				NULL, PRIORITY, 0, 0);
 
 //K_THREAD_DEFINE(Barometer_id, STACKSIZE, barometer_normal_mode_thread, NULL, NULL,
 //				NULL, PRIORITY, 0, 0);

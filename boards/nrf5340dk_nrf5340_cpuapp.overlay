@@ -142,7 +142,7 @@ arduino_spi: &spi4 {
 &i2c1 {
 	status = "okay";
     compatible = "nordic,nrf-twim";
-	clock-frequency = <I2C_BITRATE_FAST_PLUS>;
+	clock-frequency = <I2C_BITRATE_FAST>;
     pinctrl-0 = <&i2c1_default>;
 
 	ina228:ina228@45 {
@@ -195,9 +195,12 @@ my_spi_master: &spi4 {
 	pinctrl-0 = <&spi_master_default>;
 	pinctrl-1 = <&spi_master_sleep>;
 	pinctrl-names = "default", "sleep";
-	cs-gpios = <&gpio0 26 GPIO_ACTIVE_LOW>;
+	cs-gpios = <&gpio0 26 GPIO_ACTIVE_LOW>, <&gpio1 03 GPIO_ACTIVE_LOW >;
 	reg_my_spi_master:  spi-dev-a@0 {
 		reg = <0>;
+	};
+	vl53lcx8:  spi-dev-a@1 {
+		reg = <1>;
 	};
 };
 

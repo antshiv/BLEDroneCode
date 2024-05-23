@@ -4,18 +4,7 @@
 const struct device *spi_dev;
 struct k_poll_signal spi_done_sig = K_POLL_SIGNAL_INITIALIZER(spi_done_sig);
 const struct gpio_dt_spec spi4_cs = GPIO_DT_SPEC_GET(DT_ALIAS(spi4_cs), gpios);
-struct spi_cs_control spim_cs = {
-    .gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(reg_my_spi_master)),
-    .delay = 0,
-};
 
-const struct spi_config spi_cfg = {
-    .operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-                 SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_HOLD_ON_CS,
-    .frequency = 500000,//500000,//1000000,
-    .slave = 0,
-    .cs = &spim_cs,
-};
 
 void spi_init(void)
 {
@@ -25,29 +14,28 @@ void spi_init(void)
     {
         printk("SPI master device not ready!\n");
     }
-    if (!device_is_ready(spim_cs.gpio.port))
+    /*if (!device_is_ready(spim_cs.gpio.port))
     {
         printk("SPI master chip select device not ready!\n");
-    }
-	if (!gpio_is_ready_dt(&spi4_cs))
+    }*/
+    if (!gpio_is_ready_dt(&spi4_cs))
     {
         printk("Error: SPI chip select device %s is not ready\n",
                spi4_cs.port->name);
         return 0;
     }
 
-	ret = gpio_pin_configure_dt(&spi4_cs, GPIO_OUTPUT_HIGH);
-	if (ret != 0)
-	{
-		printk("Error %d: failed to configure %s pin %d\n",
-			   ret, spi4_cs.port->name, spi4_cs.pin);
-		return 0;
-	}
+    ret = gpio_pin_configure_dt(&spi4_cs, GPIO_OUTPUT_HIGH);
+    if (ret != 0)
+    {
+        printk("Error %d: failed to configure %s pin %d\n",
+               ret, spi4_cs.port->name, spi4_cs.pin);
+        return 0;
+    }
 }
 
-int spi_write_test_msg(void)
+int spi_write_test_msg(const struct spi_config *spi_cfg)
 {
-    static uint8_t counter = 0;
     static uint8_t tx_buffer[2];
     static uint8_t rx_buffer[2];
 
@@ -76,7 +64,7 @@ int spi_write_test_msg(void)
     k_poll_signal_reset(&spi_done_sig);
 
     // Start transaction
-    int error = spi_transceive_async(spi_dev, &spi_cfg, &tx, &rx, &spi_done_sig);
+    int error = spi_transceive_async(spi_dev, spi_cfg, &tx, &rx, &spi_done_sig);
     if (error != 0)
     {
         printk("SPI transceive error: %i\n", error);
@@ -93,9 +81,9 @@ int spi_write_test_msg(void)
     return 0;
 }
 
-void spi_write_msg(uint16_t len ,uint8_t *tx_buffer, uint8_t *rx_buffer)
+int spi_write_msg(const struct spi_config *spi_cfg, uint16_t len, uint8_t *tx_buffer, uint8_t *rx_buffer)
 {
-    //printk("SPI TX len %d\n", len);
+    // printk("SPI TX len %d\n", len);
 
     const struct spi_buf tx_buf = {
         .buf = tx_buffer,
@@ -114,9 +102,15 @@ void spi_write_msg(uint16_t len ,uint8_t *tx_buffer, uint8_t *rx_buffer)
 
     // Reset signal
     k_poll_signal_reset(&spi_done_sig);
+    /*
+    for (int i = 0; i < len; i++)
+    {
+        printk("BEFORE SPI TX[%d]: 0x%.2x RX[%d]: 0x%.2x\n", i, tx_buffer[i], i,  rx_buffer[i]);
+    }
+    */
 
     // Start transaction
-    int error = spi_transceive_async(spi_dev, &spi_cfg, &tx, &rx, &spi_done_sig);
+    int error = spi_transceive_async(spi_dev, spi_cfg, &tx, &rx, &spi_done_sig);
     if (error != 0)
     {
         printk("SPI transceive error: %i\n", error);
@@ -131,10 +125,10 @@ void spi_write_msg(uint16_t len ,uint8_t *tx_buffer, uint8_t *rx_buffer)
     /*
     for (int i = 0; i < len; i++)
     {
-        printk("SPI RX[%d]: 0x%.2x\n", i, rx_buffer[i]);
+        printk("SPI TX[%d]: 0x%.2x RX[%d]: 0x%.2x\n", i, tx_buffer[i], i,  rx_buffer[i]);
     }
     */
-    return 0;
+    return error;
 }
 
 /*

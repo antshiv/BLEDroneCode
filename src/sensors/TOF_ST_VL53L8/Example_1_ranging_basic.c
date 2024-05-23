@@ -105,8 +105,8 @@ int example1(const struct i2c_dt_spec *i2cSpec)
 	 */
 	Dev.platform.address = VL53L8CX_DEFAULT_I2C_ADDRESS;
 	Dev.platform.i2cSpec = i2cSpec;
-	vl53l5cx_test_i2c(&Dev);
-	return;
+	// vl53l5cx_test_i2c(&Dev);
+	// return;
 
 	/* (Optional) Reset sensor toggling PINs (see platform, not in API) */
 	// Reset_Sensor(&(Dev.platform));
@@ -142,34 +142,42 @@ int example1(const struct i2c_dt_spec *i2cSpec)
 			   VL53L8CX_API_REVISION);
 
 		printk("setting power mode to wakeup\n");
-		// status = vl53l8cx_set_power_mode(&Dev, VL53L8CX_POWER_MODE_WAKEUP); // Set mode standby
-		// if (status)
-		//	printf("Error in setting power mode\n");
+		 status = vl53l8cx_set_power_mode(&Dev, VL53L8CX_POWER_MODE_WAKEUP); // Set mode standby
+		 if (status)
+			printf("Error in setting power mode\n");
 
 		/*********************************/
 		/*         Ranging loop          */
 		/*********************************/
 
-		status = vl53l8cx_set_ranging_frequency_hz(&Dev, 2); // Set 2Hz ranging frequency
-		if (status)
-			printf("Error in setting frequency\n");
-		status = vl53l8cx_set_ranging_mode(&Dev, VL53L8CX_RANGING_MODE_CONTINUOUS); // Set mode continuous
+		//status = vl53l8cx_set_ranging_frequency_hz(&Dev, 1); // Set 2Hz ranging frequency
+		//if (status)
+		//	printf("Error in setting frequency\n");
+		status = vl53l8cx_set_ranging_mode(&Dev, VL53L8CX_RANGING_MODE_AUTONOMOUS); // Set mode continuous
 		if (status)
 			printf("Error in setting mode\n");
+
+		uint8_t p_power_mode;
+		status = vl53l8cx_get_power_mode(
+			&Dev,
+			&p_power_mode);
+
+		if (status)
+			printf("Error in getting power mode\n");
+
+		printf("Power mode is %d\n", p_power_mode);
+		printf("Ranging starts\n", status);
+
+		status = vl53l8cx_start_ranging(&Dev);
+		if (status)
+			printf("Error in starting ranging\n");
+		status = vl53l8cx_get_resolution(&Dev, &resolution);
+		if (status)
+			printf("Error in getting resolution\n");
+
+		printf("Data read size %d \n", Dev.data_read_size);
+
 	}
-	uint8_t p_power_mode;
-	status = vl53l8cx_get_power_mode(
-		&Dev,
-		&p_power_mode);
-	if (status)
-		printf("Error in getting power mode\n");
-	printf("Power mode is %d\n", p_power_mode);
-	printf("Ranging starts\n", status);
-	status = vl53l8cx_start_ranging(&Dev);
-	printf("Data read size %d \n", Dev.data_read_size);
-	status = vl53l8cx_get_resolution(&Dev, &resolution);
-	if (status)
-		printf("Error in getting resolution\n");
 
 	loop = 0;
 	while (loop < 200)
@@ -182,37 +190,53 @@ int example1(const struct i2c_dt_spec *i2cSpec)
 
 		if (isReady)
 		{
-			printf("Data read size %d \n", Dev.data_read_size);
-			memset(&Results, 0, sizeof(Results));
-			status = vl53l8cx_get_ranging_data(&Dev, &Results);
-			if (status)
-			{
-				printf("Error in getting ranging data status is %d\n", status);
-				continue;
-			}
-			printf("Status is : %u and resolution is %d\n", status, resolution);
+			vl53l8cx_get_ranging_data(&Dev, &Results);
 
 			/* As the sensor is set in 4x4 mode by default, we have a total
 			 * of 16 zones to print. For this example, only the data of first zone are
 			 * print */
-			printf("Print data no : %3u\n", Dev.streamcount);
-			for (i = 0; i < resolution; i++)
+			//printf("Print data no : %3u\n", Dev.streamcount);
+			for (i = 0; i < 16; i++)
 			{
-				printf("Zone : %3d, Status : %3u, Distance : %4d mm, Nb targets : %2u, Ambient : %4lu Kcps/spads\n",
+				printf("Zone : %3d, Status : %3u, Distance : %4d mm\n",
 					   i,
 					   Results.target_status[VL53L8CX_NB_TARGET_PER_ZONE * i],
-					   Results.distance_mm[VL53L8CX_NB_TARGET_PER_ZONE * i],
-					   Results.nb_target_detected[i],
-					   Results.ambient_per_spad[i]);
+					   Results.distance_mm[VL53L8CX_NB_TARGET_PER_ZONE * i]);
 			}
+
+			/*
+						printf("Data read size %d \n", Dev.data_read_size);
+						memset(&Results, 0, sizeof(Results));
+						status = vl53l8cx_get_ranging_data(&Dev, &Results);
+						if (status)
+						{
+							printf("Error in getting ranging data status is %d\n", status);
+							continue;
+						}
+						printf("Status is : %u and resolution is %d\n", status, resolution);
+
+						 As the sensor is set in 4x4 mode by default, we have a total
+						 * of 16 zones to print. For this example, only the data of first zone are
+						 * print
+						printf("Print data no : %3u\n", Dev.streamcount);
+						for (i = 0; i < resolution; i++)
+						{
+							printf("Zone : %3d, Status : %3u, Distance : %4d mm, Nb targets : %2u, Ambient : %4lu Kcps/spads\n",
+								   i,
+								   Results.target_status[VL53L8CX_NB_TARGET_PER_ZONE * i],
+								   Results.distance_mm[VL53L8CX_NB_TARGET_PER_ZONE * i],
+								   Results.nb_target_detected[i],
+								   Results.ambient_per_spad[i]);
+						}
+			*/
 			printf("\n");
 			loop++;
-		}
+		} else {
 
 		/* Wait a few ms to avoid too high polling (function in platform
 		 * file, not in API) */
-		WaitMs(&(Dev.platform), 2000);
-
+			WaitMs(&(Dev.platform), 5);
+		}
 	}
 
 	status = vl53l8cx_stop_ranging(&Dev);

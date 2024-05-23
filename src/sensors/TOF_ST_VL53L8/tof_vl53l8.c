@@ -1,12 +1,26 @@
 #include "tof_vl53l8.h"
+#include "VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/inc/vl53l8cx_api.h"
+#include "VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/inc/vl53l8cx_plugin_motion_indicator.h"
+#include "VL53L8CX_ULD_driver_1.2.1/VL53L8CX_ULD_API/inc/vl53l8cx_plugin_detection_thresholds.h"
 // #include "VL53LMZ_ULD_v2.0.10/VL53LMZ_ULD_API/inc/vl53lmz_api.h"
 
 const struct gpio_dt_spec spi_i2c_n = GPIO_DT_SPEC_GET(DT_ALIAS(spii2cn), gpios);
 const struct gpio_dt_spec LPn = GPIO_DT_SPEC_GET(DT_ALIAS(lpn), gpios);
 const struct gpio_dt_spec pwren = GPIO_DT_SPEC_GET(DT_ALIAS(pwren), gpios);
 const struct i2c_dt_spec vl53l8_1 = I2C_DT_SPEC_GET(VL53L8_1_NODE);
+struct spi_cs_control tof_cs = {
+    .gpio = SPI_CS_GPIOS_DT_SPEC_GET(DT_NODELABEL(vl53lcx8)),
+    .delay = 0,
+};
+const struct spi_config spi_tof_cfg = {
+    .operation = SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
+                 SPI_MODE_CPOL | SPI_MODE_CPHA | SPI_HOLD_ON_CS,
+    .frequency = 5000000, // 500000,//1000000,
+    .slave = 0,
+    .cs = &tof_cs,
+};
 
-int WaitForL5Interrupt(VL53LMZ_Configuration *pDev)
+int WaitForL5Interrupt(VL53L8CX_Configuration *pDev)
 {
   // while ( !check_for_gpio_interrupt() );
   return (1);
@@ -85,15 +99,16 @@ void Reset_Sensor_via_GPIO(void)
 #ifdef GPIO_FOR_LPn_PIN
   /* Set 1 to pin LPn */
   // HAL_GPIO_WritePin(LPn_GPIO_Port, LPn_Pin, GPIO_PIN_SET);
-  gpio_pin_set_dt(&LPn, GPIO_PIN_SET);
+  // Set for I2C and RESET for SPI
+  gpio_pin_set_dt(&LPn, GPIO_PIN_RESET);
 #endif
 
   // If I2C master does not support "I2C bus clear" feature, need to toggle I2C_SPI_N pin to release I2C bus
-  gpio_pin_set_dt(&spi_i2c_n, GPIO_PIN_RESET);
-  k_msleep(1);
   gpio_pin_set_dt(&spi_i2c_n, GPIO_PIN_SET);
   k_msleep(1);
   gpio_pin_set_dt(&spi_i2c_n, GPIO_PIN_RESET);
+  k_msleep(1);
+  gpio_pin_set_dt(&spi_i2c_n, GPIO_PIN_SET);
   k_msleep(1);
 
   return;
@@ -107,8 +122,14 @@ void Reset_Sensor_via_GPIO(void)
  */
 void tof_vl5318_thread(void)
 {
-  /* USER CODE BEGIN 1 */
-  int status;
+  /*********************************/
+  /*   VL53L8CX ranging variables  */
+  /*********************************/
+
+  uint8_t status, loop, isAlive, isReady, i;
+  VL53L8CX_Configuration Dev;   /* Sensor configuration */
+  VL53L8CX_ResultsData Results; /* Results data from VL53L8CX */
+  uint8_t resolution;
   /* USER CODE END 1 */
 
   gpio_pin_configure_dt(&spi_i2c_n, GPIO_OUTPUT);
@@ -118,29 +139,56 @@ void tof_vl5318_thread(void)
 
   printf("\n\nVL53LMZ_ULD_TEST\n\n");
 
-  /* USER CODE END 2 */
+  Dev.platform.address = VL53L8CX_DEFAULT_I2C_ADDRESS;
+  //Dev.platform.i2cSpec = &vl53l8_1;
+  Dev.platform.spi_tof_cfg = &spi_tof_cfg;
+  Dev.platform.spi_dev = spi_dev;
+  Dev.platform.i2c_spi = 1;
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  status = 0;
-  while (status == 0)
+  status = vl53l8cx_is_alive(&Dev, &isAlive);
+  if (!isAlive || status)
   {
-    // status = example1();
-    // status = example2();
-    // status = example5();
-    printk("Running example11\n");
-    status = example1(&vl53l8_1);
-    // continous_mode(&vl53l8_1);
-    printk("Finished example11\n");
-    k_yield();
-    k_msleep(1000);
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
+    printf("VL53L8CX not detected at requested address\n");
+    return status;
   }
+  /* (Mandatory) Init VL53L8CX sensor */
+  status = vl53l8cx_init(&Dev);
+  if (status)
+  {
+    printf("VL53L8CX ULD Loading failed status error %d \n", status);
+    return status;
+  }
+
+  status = vl53l8cx_set_ranging_mode(&Dev, VL53L8CX_RANGING_MODE_AUTONOMOUS); // Set mode continuous
+  if (status)
+    printf("Error in setting mode\n");
+
+  status = vl53l8cx_start_ranging(&Dev);
+  if (status)
+    printf("Error in starting ranging\n");
+
+  /* USER CODE BEGIN 3 */
   for (;;)
   {
-    k_msleep(1000);
+    status = vl53l8cx_check_data_ready(&Dev, &isReady);
+    if (isReady)
+    {
+      vl53l8cx_get_ranging_data(&Dev, &Results);
+			printf("Print data no : %3u\n", Dev.streamcount);
+      for (i = 0; i < 16; i++)
+      {
+        printf("Zone : %3d, Status : %3u, Distance : %4d mm\n",
+               i,
+               Results.target_status[VL53L8CX_NB_TARGET_PER_ZONE * i],
+               Results.distance_mm[VL53L8CX_NB_TARGET_PER_ZONE * i]);
+      }
+      printf("\n");
+    }
+    else
+    {
+      k_yield();
+      k_msleep(5);
+    }
   }
   /* USER CODE END 3 */
 }
@@ -150,7 +198,7 @@ void tof_vl5318_thread(void)
  * --------------------------------------------------
  */
 
-uint8_t vl53l5cx_test_i2c(VL53LMZ_Configuration *p_dev)
+uint8_t vl53l5cx_test_i2c(VL53L8CX_Configuration *p_dev)
 {
   uint8_t status = 0;
   printf("Starting VL53L5CX I2C test...\n");

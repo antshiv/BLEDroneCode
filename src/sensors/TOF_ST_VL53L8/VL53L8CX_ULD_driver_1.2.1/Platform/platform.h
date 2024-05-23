@@ -33,6 +33,9 @@ typedef struct
 	/* Example for most standard platform : I2C address of sensor */
     uint16_t  			address;
 	const struct i2c_dt_spec *i2cSpec;
+	const struct spi_config *spi_tof_cfg;
+	const struct dev *spi_dev;
+	bool i2c_spi;
 
 } VL53L8CX_Platform;
 
